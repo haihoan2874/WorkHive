@@ -6,17 +6,17 @@ Mục tiêu: Xây dựng một Task & Blog Platform (API bằng Laravel, fronten
 
 Tuần 1 — Backend (Laravel API)
 
-- Ngày 1 — Khởi tạo & DB
+- (Xong)Ngày 1 — Khởi tạo & DB
   - Tạo project: composer create-project laravel/laravel workhive
   - Tạo .env, cấu hình DB MySQL, php artisan key:generate
   - Tạo migration users (name, email, password, role)
   - Chạy: composer install, php artisan migrate
-- Ngày 2 — Auth với Sanctum
+- (Xong)Ngày 2 — Auth với Sanctum
   - Cài: composer require laravel/sanctum
   - Publish config & migrate
   - Tạo AuthController: register/login/logout (token-based)
   - Test API bằng Postman (Register → Login → Bearer token)
-- Ngày 3 — Projects
+- (Xong)Ngày 3 — Projects
   - Migration projects (id, title, description, owner_id, status, deadline)
   - Model Project + policy (owner only edit)
   - Controller ProjectController: index, show, store, update, destroy
