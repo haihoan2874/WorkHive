@@ -21,7 +21,7 @@ Tuần 1 — Backend (Laravel API)
   - Model Project + policy (owner only edit)
   - Controller ProjectController: index, show, store, update, destroy
   - Routes API: /api/projects
-- Ngày 4 — Tasks (liên kết Project)
+    -(Xong) Ngày 4 — Tasks (liên kết Project)
   - Migration tasks (id, project_id, title, description, due_date, status, assignee_id)
   - Quan hệ: Project hasMany Tasks; Task belongsTo Project
   - TaskController CRUD; route /api/projects/{project}/tasks hoặc /api/tasks
