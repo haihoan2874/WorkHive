@@ -25,10 +25,10 @@ Tuần 1 — Backend (Laravel API)
   - Migration tasks (id, project_id, title, description, due_date, status, assignee_id)
   - Quan hệ: Project hasMany Tasks; Task belongsTo Project
   - TaskController CRUD; route /api/projects/{project}/tasks hoặc /api/tasks
-- Ngày 5 — Posts (Blog)
+- (Xong) Ngày 5 — Posts (Blog)
   - Migration posts (id, user_id, title, body, published_at, slug)
   - Controller PostController CRUD; route /api/posts
-- Ngày 6 — Comments (liên kết Post)
+- (Xong) Ngày 6 — Comments (liên kết Post)
   - Migration comments (id, post_id, user_id, body)
   - CommentController CRUD; route /api/posts/{post}/comments
 - Ngày 7 — Review

@@ -3,6 +3,9 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Post;
+use App\Models\Comment;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class CommentController extends Controller
@@ -12,9 +15,15 @@ class CommentController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Post $post): JsonResponse
     {
-        //
+        $comments = $post->comments()->with('user')->latest()->get();
+        return response()->json([
+            'status' => 'success',
+            'data' => [
+                'comments' => $comments,
+            ]
+        ], 200);
     }
 
     /**
@@ -33,9 +42,26 @@ class CommentController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Request $request, Post $post): JsonResponse
     {
-        //
+        $request->validate([
+            'body' => 'required|string'
+        ]);
+
+        $comment = Comment::create([
+            'post_id' => $post->id,
+            'user_id' => $request->user()->id,
+            'body' => $request->body,
+        ]);
+
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Comment created',
+            'data' => [
+                'comment' => $comment->load('user')
+            ]
+        ], 201);
     }
 
     /**
@@ -78,8 +104,17 @@ class CommentController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request, Comment $comment): JsonResponse
     {
-        //
+        if (
+            $comment->user_id !== $request->user()->id &&
+            $comment->post->user_id !== $request->user()->id
+        ) {
+            return response()->json(['status' => 'error', 'message' => 'Forbidden'], 403);
+        }
+
+        $comment->delete();
+
+        return response()->json(['status' => 'success', 'message' => 'Comment deleted'], 200);
     }
 }
