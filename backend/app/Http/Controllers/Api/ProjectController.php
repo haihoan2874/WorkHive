@@ -3,6 +3,9 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreProjectRequest;
+use App\Http\Requests\UpdateProjectRequest;
+use App\Http\Resources\ProjectResource;
 use App\Models\Project;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -22,13 +25,21 @@ class ProjectController extends Controller
     {
         $projects = $request->user()
             ->projects()
-            ->with(['owner', 'tasks'])
+            ->with('owner')
             ->latest()
-            ->get();
+            ->paginate(10);
 
         return response()->json([
             'status' => 'success',
-            'data' => ['projects' => $projects]
+            'data' => [
+                'projects' => ProjectResource::collection($projects),
+                'meta' => [
+                    'current_page' => $projects->currentPage(),
+                    'last_page' => $projects->lastPage(),
+                    'per_page' => $projects->perPage(),
+                    'total' => $projects->total(),
+                ],
+            ],
         ], 200);
     }
 
@@ -50,21 +61,13 @@ class ProjectController extends Controller
      */
 
     //Tạo project mới
-    public function store(Request $request): JsonResponse
+    public function store(StoreProjectRequest $request): JsonResponse
     {
-        $data = $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'deadline' => 'nullable|date',
-            'status' => 'nullable|in:pending,in_progress,completed',
-        ]);
-
-        $project = $request->user()->projects()->create($data);
-
+        $project = $request->user()->projects()->create($request->validated());
         return response()->json([
             'status' => 'success',
             'message' => 'Project created',
-            'data' => ['project' => $project]
+            'data' => ['project' => new ProjectResource($project->load('owner'))],
         ], 201);
     }
 
@@ -78,16 +81,10 @@ class ProjectController extends Controller
     //lấy thông tin chi tiết 1 project
     public function show(Request $request, Project $project): JsonResponse
     {
-        if ($project->owner_id !== $request->user()->id) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Forbidden'
-            ], 403);
-        }
-
+        $this->authorize('view', $project);
         return response()->json([
             'status' => 'success',
-            'data' => ['project' => $project->load(['owner', 'tasks'])]
+            'data' => ['project' => new ProjectResource($project->load('owner'))],
         ], 200);
     }
 
@@ -111,28 +108,14 @@ class ProjectController extends Controller
      */
 
     //Cập nhật thông tin project
-    public function update(Request $request, Project $project): JsonResponse
+    public function update(UpdateProjectRequest $request, Project $project): JsonResponse
     {
-        if ($project->owner_id !== $request->user()->id) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Forbidden'
-            ], 403);
-        }
-
-        $data = $request->validate([
-            'title' => 'sometimes|required|string|max:255',
-            'description' => 'nullable|string',
-            'deadline' => 'nullable|date',
-            'status' => 'nullable|in:pending,in_progress,completed',
-        ]);
-
-        $project->update($data);
-
+        $this->authorize('update', $project);
+        $project->update($request->validated());
         return response()->json([
             'status' => 'success',
             'message' => 'Project updated',
-            'data' => ['project' => $project]
+            'data' => ['project' => new ProjectResource($project->load('owner'))],
         ], 200);
     }
 
@@ -146,13 +129,7 @@ class ProjectController extends Controller
     //Xóa project
     public function destroy(Request $request, Project $project): JsonResponse
     {
-        $user = $request->user();
-        if ($project->owner_id !== $user->id) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Forbidden'
-            ], 403);
-        }
+        $this->authorize('delete', $project);
 
         $project->delete();
 

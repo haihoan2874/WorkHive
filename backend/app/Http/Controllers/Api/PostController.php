@@ -3,6 +3,9 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StorePostRequest;
+use App\Http\Requests\UpdatePostRequest;
+use App\Http\Resources\PostResource;
 use App\Models\Post;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -22,7 +25,13 @@ class PostController extends Controller
         return response()->json([
             'status' => 'success',
             'data' => [
-                'posts' => $posts,
+                'posts' => PostResource::collection($posts),
+                'meta' => [
+                    'current_page' => $posts->currentPage(),
+                    'last_page' => $posts->lastPage(),
+                    'per_page' => $posts->perPage(),
+                    'total' => $posts->total(),
+                ]
             ]
         ], 200);
     }
@@ -43,22 +52,15 @@ class PostController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request): JsonResponse
+    public function store(StorePostRequest $request): JsonResponse
     {
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'slug' => 'required|string|max:255|unique:posts,slug',
-            'body' => 'required|string',
-            'published_at' => 'nullable|date',
-        ]);
-
-        $post = $request->user()->posts()->create($request->only('title', 'slug', 'body', 'published_at'));
+        $post = $request->user()->posts()->create($request->validated());
 
         return response()->json([
             'status' => 'success',
             'message' => 'Post created',
             'data' => [
-                'post' => $post->load('user')
+                'post' => new PostResource($post->load('user')),
             ]
         ], 201);
     }
@@ -74,7 +76,7 @@ class PostController extends Controller
         return response()->json([
             'status' => 'success',
             'data' => [
-                'post' => $post->load('user', 'comments.user')
+                'post' => new PostResource($post->load('user'))
             ]
         ], 200);
     }
@@ -97,30 +99,33 @@ class PostController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Post $post): JsonResponse
+    public function update(UpdatePostRequest $request, Post $post): JsonResponse
     {
-        if ($post->user_id !== $request->user()->id) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Forbidden',
+        // if ($post->user_id !== $request->user()->id) {
+        //     return response()->json([
+        //         'status' => 'error',
+        //         'message' => 'Forbidden',
 
-            ], 403);
-        }
+        //     ], 403);
+        // }
 
-        $request->validate([
-            'title' => 'sometimes|required|string|max:255',
-            'slug' => 'sometimes|required|string|max:255|unique:posts,slug,' . $post->id,
-            'body' => 'sometimes|required|string',
-            'published_at' => 'nullable|date',
-        ]);
+        // $request->validate([
+        //     'title' => 'sometimes|required|string|max:255',
+        //     'slug' => 'sometimes|required|string|max:255|unique:posts,slug,' . $post->id,
+        //     'body' => 'sometimes|required|string',
+        //     'published_at' => 'nullable|date',
+        // ]);
 
-        $post->update($request->only('title', 'slug', 'body', 'published_at'));
+        $this->authorize('update', $post);
+
+        // $post->update($request->only('title', 'slug', 'body', 'published_at'));
+        $post->update($request->validated());
 
         return response()->json([
             'status' => 'success',
             'message' => 'Post updated',
             'data' => [
-                'post' => $post->load('user')
+                'post' => new PostResource($post->load('user'))
             ]
         ], 200);
     }
@@ -133,12 +138,14 @@ class PostController extends Controller
      */
     public function destroy(Request $request, Post $post): JsonResponse
     {
-        if ($post->user_id !== $request->user()->id) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Forbidden',
-            ], 403);
-        }
+        // if ($post->user_id !== $request->user()->id) {
+        //     return response()->json([
+        //         'status' => 'error',
+        //         'message' => 'Forbidden',
+        //     ], 403);
+        // }
+        $this->authorize('delete',$post);
+
         $post->delete();
 
         return response()->json([

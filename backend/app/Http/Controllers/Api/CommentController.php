@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreCommentRequest;
+use App\Http\Resources\CommentResource;
 use App\Models\Post;
 use App\Models\Comment;
 use Illuminate\Http\JsonResponse;
@@ -17,11 +19,17 @@ class CommentController extends Controller
      */
     public function index(Post $post): JsonResponse
     {
-        $comments = $post->comments()->with('user')->latest()->get();
+        $comments = $post->comments()->with('user')->latest()->paginate(10);
         return response()->json([
             'status' => 'success',
             'data' => [
-                'comments' => $comments,
+                'comments' => CommentResource::collection($comments),
+                'meta' => [
+                    'current_page' => $comments->currentPage(),
+                    'last_page' => $comments->lastPage(),
+                    'per_page' => $comments->perPage(),
+                    'total' => $comments->total(),
+                ]
             ]
         ], 200);
     }
@@ -42,16 +50,16 @@ class CommentController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request, Post $post): JsonResponse
+    public function store(StoreCommentRequest $request, Post $post): JsonResponse
     {
-        $request->validate([
-            'body' => 'required|string'
-        ]);
+        // $request->validate([
+        //     'body' => 'required|string'
+        // ]);
 
         $comment = Comment::create([
             'post_id' => $post->id,
             'user_id' => $request->user()->id,
-            'body' => $request->body,
+            'body' => $request->validated()['body'],
         ]);
 
 
@@ -59,7 +67,7 @@ class CommentController extends Controller
             'status' => 'success',
             'message' => 'Comment created',
             'data' => [
-                'comment' => $comment->load('user')
+                'comment' => new CommentResource($comment->load('user')),
             ]
         ], 201);
     }
@@ -106,12 +114,13 @@ class CommentController extends Controller
      */
     public function destroy(Request $request, Comment $comment): JsonResponse
     {
-        if (
-            $comment->user_id !== $request->user()->id &&
-            $comment->post->user_id !== $request->user()->id
-        ) {
-            return response()->json(['status' => 'error', 'message' => 'Forbidden'], 403);
-        }
+        // if (
+        //     $comment->user_id !== $request->user()->id &&
+        //     $comment->post->user_id !== $request->user()->id
+        // ) {
+        //     return response()->json(['status' => 'error', 'message' => 'Forbidden'], 403);
+        // }
+        $this->authorize('delete', $comment);
 
         $comment->delete();
 
