@@ -31,7 +31,7 @@ Tuần 1 — Backend (Laravel API)
 - (Xong) Ngày 6 — Comments (liên kết Post)
   - Migration comments (id, post_id, user_id, body)
   - CommentController CRUD; route /api/posts/{post}/comments
-- Ngày 7 — Review
+- (Xong)Ngày 7 — Review
   - Viết API Resource/Transformer
   - Thêm validation, policies, error handling
   - Tạo seeders & factory dữ liệu mẫu
