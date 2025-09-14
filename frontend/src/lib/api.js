@@ -36,4 +36,50 @@ api.interceptors.response.use(
   }
 );
 
+export const login = async (email, password) => {
+  try {
+    const response = await api.post("/login", { email, password });
+    const { token, user } = response.data;
+
+    localStorage.setItem("token", token);
+    return {
+      success: true,
+      user,
+      token,
+    };
+  } catch {
+    error;
+  }
+  {
+    return {
+      success: false,
+      error: error.response.data.message || "Đăng nhập thất bại",
+    };
+  }
+};
+
+export const register = async (name, email, password) => {
+  try {
+    const response = await api.post("/register", { name, email, password });
+    const { token, user } = response.data;
+
+    localStorage.setItem("token", token);
+    return {
+      success: true,
+      user,
+      token,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: error.response.data.message || "Đăng ký thất bại",
+    };
+  }
+};
+
+export const logout = () => {
+  localStorage.removeItem("token");
+  window.location.href = "/login";
+};
+
 export default api;

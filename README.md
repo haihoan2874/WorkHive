@@ -39,7 +39,7 @@ Tuần 1 — Backend (Laravel API)
 
 Tuần 2 — Frontend cơ bản (React + Vite + Tailwind)
 
-- Ngày 8 — Setup UI
+-(Xong) Ngày 8 — Setup UI
   - pnpm/npm create vite@latest workhive-frontend --template react
   - Cài tailwind, cấu hình, tạo layout (Navbar, Sidebar)
 - Ngày 9 — Auth UI
