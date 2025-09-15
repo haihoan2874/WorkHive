@@ -30,7 +30,7 @@ api.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       localStorage.removeItem("token");
-      window.location.href = "login";
+      window.location.href = "/login";
     }
     return Promise.reject(error);
   }
@@ -38,48 +38,46 @@ api.interceptors.response.use(
 
 export const login = async (email, password) => {
   try {
-    const response = await api.post("/login", { email, password });
-    const { token, user } = response.data;
-
-    localStorage.setItem("token", token);
-    return {
-      success: true,
-      user,
-      token,
-    };
-  } catch {
-    error;
-  }
-  {
+    const response = await api.post("/auth/login", { email, password });
+    const { token, user } = response.data?.data || {};
+    if (token) localStorage.setItem("token", token);
+    return { success: true, user, token };
+  } catch (error) {
     return {
       success: false,
-      error: error.response.data.message || "Đăng nhập thất bại",
+      error: error?.response?.data?.message || "Đăng nhập thất bại",
     };
   }
 };
 
 export const register = async (name, email, password) => {
   try {
-    const response = await api.post("/register", { name, email, password });
-    const { token, user } = response.data;
-
-    localStorage.setItem("token", token);
-    return {
-      success: true,
-      user,
-      token,
-    };
+    const response = await api.post("/auth/register", {
+      name,
+      email,
+      password,
+      password_confirmation: password,
+    });
+    const { token, user } = response.data?.data || {};
+    if (token) localStorage.setItem("token", token);
+    return { success: true, user, token };
   } catch (error) {
     return {
       success: false,
-      error: error.response.data.message || "Đăng ký thất bại",
+      error: error?.response?.data?.message || "Đăng ký thất bại",
     };
   }
 };
 
-export const logout = () => {
-  localStorage.removeItem("token");
-  window.location.href = "/login";
+export const logout = async () => {
+  try {
+    await api.post("/auth/logout");
+  } catch (error) {
+    console.log("Logout failed: ", error);
+  } finally {
+    localStorage.removeItem("token");
+    window.location.href = "/login";
+  }
 };
 
 export default api;

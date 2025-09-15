@@ -1,18 +1,17 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import logo from "../assets/logo.png";
+import { useNavigate } from "react-router-dom";
+import { logout } from "../lib/api";
 
 // Layout component
 const Layout = ({ children }) => {
-  // Tạm thời bỏ useNavigate để test
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // Hàm xử lý Logout (tạm thời)
-  const handleLogout = () => {
-    console.log("Logout clicked"); // Test log
-    // removeToken();
-    // navigate("/login");
+  const handleLogout = async () => {
+    await logout();
   };
 
   return (

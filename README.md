@@ -40,9 +40,10 @@ Tuần 1 — Backend (Laravel API)
 Tuần 2 — Frontend cơ bản (React + Vite + Tailwind)
 
 -(Xong) Ngày 8 — Setup UI
-  - pnpm/npm create vite@latest workhive-frontend --template react
-  - Cài tailwind, cấu hình, tạo layout (Navbar, Sidebar)
-- Ngày 9 — Auth UI
+
+- pnpm/npm create vite@latest workhive-frontend --template react
+- Cài tailwind, cấu hình, tạo layout (Navbar, Sidebar)
+-(Xong) Ngày 9 — Auth UI
   - Forms Register/Login, call /api/register & /api/login
   - Lưu token vào localStorage; tạo helper fetch với Authorization header
 - Ngày 10 — Dashboard
