@@ -1,35 +1,41 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import logo from "../assets/logo.png";
-import { useNavigate } from "react-router-dom";
 import { logout } from "../lib/api";
 
-// Layout component
 const Layout = ({ children }) => {
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  // Hàm xử lý Logout (tạm thời)
   const handleLogout = async () => {
     await logout();
+    navigate("/"); // logout xong về trang chủ (tùy bạn muốn điều hướng đi đâu)
   };
+
+  // class cho link
+  const linkClass = ({ isActive }) =>
+    `group flex items-center px-2 py-2 font-medium rounded-md transition-colors
+     ${
+       isActive
+         ? "underline text-blue-600 font-semibold bg-gray-100"
+         : "text-gray-600 hover:bg-gray-200 hover:text-gray-900 hover:underline"
+     }`;
 
   return (
     <div className="min-h-screen bg-gray-100">
-      {/* Navbar - thanh điều hướng trên cùng */}
+      {/* Navbar */}
       <nav className="bg-white shadow border-b">
         <div className="flex items-center justify-between max-w-6xl mx-auto px-4 py-2 sm:px-6 lg:px-8">
-          {/* Logo + mobile menu button*/}
           <div className="flex items-center justify-between w-full">
-            <Link
+            <NavLink
               to="/"
               className="flex items-center gap-3 text-gray-900 text-xl font-bold"
             >
               <img src={logo} alt="logo" className="h-8 w-8 rounded-full" />
-              <span className="">WorkHive</span>
-            </Link>
+              <span>WorkHive</span>
+            </NavLink>
 
-            {/* icon 3 gach */}
+            {/* nút 3 gạch cho mobile */}
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
               className="md:hidden p-2 rounded-md text-gray-600 hover:text-gray-900 mr-2"
@@ -49,7 +55,8 @@ const Layout = ({ children }) => {
               </svg>
             </button>
           </div>
-          {/* nút đăng xuất bên phải */}
+
+          {/* nút logout desktop */}
           <div className="hidden md:block">
             <button
               onClick={handleLogout}
@@ -61,9 +68,8 @@ const Layout = ({ children }) => {
         </div>
       </nav>
 
-      {/* Main layout - Chia làm 2 phần: sidebar + content */}
-      <div className="flex ">
-        {/* Mobile sidebar overlay */}
+      <div className="flex">
+        {/* overlay mobile */}
         {sidebarOpen && (
           <div
             onClick={() => setSidebarOpen(false)}
@@ -72,15 +78,15 @@ const Layout = ({ children }) => {
             <div className="absolute inset-0 bg-gray-600 opacity-75"></div>
           </div>
         )}
-        {/* Sidebar - Menu bên trái */}
+
+        {/* Sidebar */}
         <aside
           className={`fixed inset-y-0 right-0 z-50 w-64 bg-white shadow-sm transition-transform duration-300 ease-in-out md:static md:h-screen md:translate-x-0 md:z-auto ${
             sidebarOpen ? "translate-x-0" : "translate-x-full"
           }`}
         >
-          {/* Sidebar content */}
-          <nav className="mt-5 px-4 ">
-            {/* Close button */}
+          <nav className="mt-5 px-4">
+            {/* close button mobile */}
             <div className="md:hidden flex justify-start p-2 ">
               <button
                 onClick={() => setSidebarOpen(false)}
@@ -102,33 +108,30 @@ const Layout = ({ children }) => {
               </button>
             </div>
 
-            {/* Dashboard link */}
-            <Link
+            {/* các link */}
+            <NavLink
               to="/"
+              className={linkClass}
               onClick={() => setSidebarOpen(false)}
-              className="group flex items-center px-2 py-2 font-medium rounded-md text-gray-600 hover:bg-gray-200 hover:text-gray-900 transition-colors"
             >
               📊 Dashboard
-            </Link>
-            {/* Project Link */}
-            <Link
+            </NavLink>
+            <NavLink
               to="/projects"
+              className={linkClass}
               onClick={() => setSidebarOpen(false)}
-              className="group flex items-center px-2 py-2 font-medium rounded-md text-gray-600 hover:bg-gray-200 hover:text-gray-900 transition-colors"
             >
               🤝 Projects
-            </Link>
-            {/* Posts Link */}
-            <Link
+            </NavLink>
+            <NavLink
               to="/posts"
+              className={linkClass}
               onClick={() => setSidebarOpen(false)}
-              className="group flex items-center px-2 py-2 font-medium rounded-md text-gray-600 hover:bg-gray-200 hover:text-gray-900 transition-colors"
             >
               📝 Blog Posts
-            </Link>
+            </NavLink>
 
-            {/* Mobile Logout button */}
-
+            {/* Logout mobile */}
             <div className="md:hidden mt-4 pt-4 border-t border-gray-200">
               <button
                 onClick={() => {
@@ -143,11 +146,8 @@ const Layout = ({ children }) => {
           </nav>
         </aside>
 
-        {/* Main Content - khu vực hiển thị nội dung */}
-        <main className="flex-1 p-4 md:p-6">
-          {/* render nội dung được truyền vào */}
-          {children}
-        </main>
+        {/* Content */}
+        <main className="flex-1 p-4 md:p-6">{children}</main>
       </div>
     </div>
   );
