@@ -12,6 +12,7 @@ import Projects from "./pages/Projects";
 import Posts from "./pages/Posts";
 import Layout from "./components/Layout";
 import { isAuthenticated } from "./lib/auth";
+import ProjectDetails from "./pages/ProjectDetails";
 
 function App() {
   const [user, setUser] = useState(null);
@@ -59,6 +60,18 @@ function App() {
               isAuthenticated() ? (
                 <Layout>
                   <Projects />
+                </Layout>
+              ) : (
+                <Navigate to="/login" />
+              )
+            }
+          />
+          <Route
+            path="/projects/:id"
+            element={
+              isAuthenticated() ? (
+                <Layout>
+                  <ProjectDetails />
                 </Layout>
               ) : (
                 <Navigate to="/login" />

@@ -20,7 +20,14 @@ const Layout = ({ children }) => {
          ? "underline text-blue-600 font-semibold bg-gray-100"
          : "text-gray-600 hover:bg-gray-200 hover:text-gray-900 hover:underline"
      }`;
-
+  const storedUser = (() => {
+    try {
+      return JSON.parse(localStorage.getItem("user") || "null");
+    } catch {
+      return null;
+    }
+  })();
+  const displayName = storedUser?.name || storedUser?.email || "Guest";
   return (
     <div className="min-h-screen bg-gray-100">
       {/* Navbar */}
@@ -107,6 +114,13 @@ const Layout = ({ children }) => {
                 </svg>
               </button>
             </div>
+
+            {storedUser && (
+              <div className="px-3 py-3 mb-5 rounded-md bg-blue-200 shadow-sm text-gray-700 ">
+                <div className="text-xl text-center">Welcome</div>
+                <div className="font-bold text-lg text-center truncate uppercase">{displayName}</div>
+              </div>
+            )}
 
             {/* các link */}
             <NavLink

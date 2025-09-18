@@ -1,4 +1,5 @@
 import axios from "axios";
+import { data } from "react-router-dom";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000/api";
 
@@ -41,6 +42,7 @@ export const login = async (email, password) => {
     const response = await api.post("/auth/login", { email, password });
     const { token, user } = response.data?.data || {};
     if (token) localStorage.setItem("token", token);
+    if (user) localStorage.setItem("user", JSON.stringify(user));
     return { success: true, user, token };
   } catch (error) {
     return {
@@ -60,6 +62,7 @@ export const register = async (name, email, password) => {
     });
     const { token, user } = response.data?.data || {};
     if (token) localStorage.setItem("token", token);
+    if (user) localStorage.setItem("user", JSON.stringify(user));
     return { success: true, user, token };
   } catch (error) {
     return {
@@ -80,4 +83,33 @@ export const logout = async () => {
   }
 };
 
+export const getProject = async (id) => {
+  try {
+    const response = await api.get(`/projects/${id}`);
+    return {
+      success: true,
+      data: response.data,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: error?.response?.data?.message || "Lấy project thất bại",
+    };
+  }
+};
+
+export const getProjectTasks = async (projectId) => {
+  try {
+    const response = await api.get(`/projects/${projectId}/tasks`);
+    return {
+      success: true,
+      data: response.data,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: error?.response?.data?.message || "Lấy task thất bại",
+    };
+  }
+};
 export default api;
