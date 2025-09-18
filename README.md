@@ -46,9 +46,9 @@ Tuần 2 — Frontend cơ bản (React + Vite + Tailwind)
 -(Xong) Ngày 9 — Auth UI
   - Forms Register/Login, call /api/register & /api/login
   - Lưu token vào localStorage; tạo helper fetch với Authorization header
-- Ngày 10 — Dashboard
+-(Xong) Ngày 10 — Dashboard
   - Page: /dashboard — fetch /api/projects, show cards
-- Ngày 11 — Project Detail
+-(Xong) Ngày 11 — Project Detail
   - Page: /projects/:id — fetch project + tasks, list tasks
 - Ngày 12 — Blog list
   - Page: /posts — fetch /api/posts
