@@ -33,6 +33,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('auth/me', [AuthController::class, 'me']);
     Route::apiResource('projects', ProjectController::class);
     Route::apiResource('tasks', TaskController::class);
+    Route::get('projects/{project}/tasks', [TaskController::class, 'getProjectTasks']);
+
     Route::apiResource('posts', PostController::class);
     Route::get('posts/{post}/comments', [CommentController::class, 'index']);
     Route::post('posts/{post}/comments', [CommentController::class, 'store']);

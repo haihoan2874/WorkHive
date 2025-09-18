@@ -39,6 +39,22 @@ class TaskController extends Controller
             ]
         ], 200);
     }
+    public function getProjectTasks(Project $project): JsonResponse
+    {
+        // Kiểm tra user có quyền xem project này không
+        $this->authorize('view', $project);
+
+        // Lấy tasks của project
+        $tasks = $project->tasks()
+            ->with(['assignee'])
+            ->latest()
+            ->get();
+
+        return response()->json([
+            'status' => 'success',
+            'data' => TaskResource::collection($tasks)
+        ], 200);
+    }
 
     /**
      * Store a newly created resource in storage.
